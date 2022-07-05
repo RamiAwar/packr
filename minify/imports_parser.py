@@ -1,7 +1,7 @@
 import ast
 import collections
 
-Module = collections.namedtuple("Module", ["name", "try_", "file", "lineno"])
+Module = collections.namedtuple("Module", ["name", "try_", "file", "lineno", "alias"])
 
 
 class ImportsParser:
@@ -16,9 +16,9 @@ class ImportsParser:
         self._lineno = lineno - 1
         self.visit(parsed)
 
-    def _add_module(self, name, try_, lineno):
+    def _add_module(self, name, try_, lineno, alias):
         self._modules.append(
-            Module(name=name, try_=try_, file=self._fpath, lineno=lineno)
+            Module(name=name, try_=try_, file=self._fpath, lineno=lineno, alias=alias)
         )
 
     def _add_rawcode(self, code, lineno):
@@ -29,14 +29,14 @@ class ImportsParser:
         """As we know: `import a [as b]`."""
         lineno = node.lineno + self._lineno
         for alias in node.names:
-            self._add_module(alias.name, try_, lineno)
+            self._add_module(alias.name, try_, lineno, alias.name)
 
     def visit_ImportFrom(self, node, try_=False):
         """
         As we know: `from a import b [as c]`. If node.level is not 0,
         import statement like this `from .a import b`.
         """
-        # TODO: Better name needed here
+
         mod_name = node.module
         level = node.level
         if mod_name is None:
@@ -47,7 +47,7 @@ class ImportsParser:
             if level > 0 or mod_name == "":
                 name = level * "." + mod_name + "." + alias.name
             lineno = node.lineno + self._lineno
-            self._add_module(name, try_, lineno)
+            self._add_module(name, try_, lineno, alias.name)
 
     def visit_TryExcept(self, node):
         """

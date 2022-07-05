@@ -1,4 +1,4 @@
-from core_package.core_package import ex
+from core_package.main import ex
 
 
 def main():

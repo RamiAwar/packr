@@ -90,8 +90,6 @@ def parse_package_imports(package_root, ignores=None):
                 user_modules.add(fpath)
             code = read_code(fpath)
             if code:
-                if "create_indices" in fn:
-                    print("hello")
                 imports = parse_file_imports(fpath, code)
                 imported_modules.extend(imports)
         if has_py:
@@ -154,24 +152,31 @@ def minimum_dependency_set(
     # Create maps of file -> set of deps
     main_modules: Dict[str, Set[str]] = collections.defaultdict(set)
     for module in main_imported_modules:
-        main_modules[module.file].add(module.name)
+        if any(
+            str(Path(*module.name.split("."), module.alias)) in m
+            for m in main_user_modules
+        ):
+            main_modules[module.file].add(module.name + "." + module.alias)
+        else:
+            main_modules[module.file].add(module.name)
 
     core_modules: Dict[str, Set[str]] = collections.defaultdict(set)
     for module in core_imported_modules:
-        core_modules[module.file].add(
-            # ".".join(import_extractor(module.file[:-3], core_module_name))
-            module.name
-        )
+        if any(
+            str(Path(*module.name.split("."), module.alias)) in m
+            for m in core_user_modules
+        ):
+            core_modules[module.file].add(module.name + "." + module.alias)
+        else:
+            core_modules[module.file].add(
+                # ".".join(import_extractor(module.file[:-3], core_module_name))
+                module.name
+            )
 
     # Import path -> path map for core package
     core_import_to_path_map = {
         ".".join(import_extractor(path[:-3], core_module_name)): path
         for path in core_user_modules
-    }
-
-    main_import_to_path_map = {
-        ".".join(import_extractor(path[:-3], main_module_name)): path
-        for path in main_user_modules
     }
 
     core_user_import_names: List[str] = [
@@ -190,6 +195,7 @@ def minimum_dependency_set(
             # Check if module is part of core module first
             if module in core_import_to_path_map:
                 necessary_files.append(core_import_to_path_map[module])
+
             # elif module in main_import_to_path_map:
             #     necessary_files.append(main_import_to_path_map[module])
             # else:
@@ -202,13 +208,26 @@ def minimum_dependency_set(
         f = necessary_files.popleft()
         visited_files.add(f)
 
-        modules = core_modules[f]
+        modules = udeque(core_modules[f])
+        visited = set()
 
-        for module in modules:
+        while modules:
+            module = modules.popleft()
+            if module in visited:
+                continue
+
+            visited.add(module)
+
             if module in core_user_import_names:
                 file = core_import_to_path_map[module]
                 if file not in visited_files:
                     necessary_files.append(file)
+            elif module.startswith(core_module_name):
+                # This is probably a package import (not specific file)
+                # Need to import all subfiles/packages in this case
+                for m in core_user_import_names:
+                    if m.startswith(module):
+                        modules.append(m)
             else:
                 # If third party module, specify main package name only
                 # if core_module_name not in module and "." in module:

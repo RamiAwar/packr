@@ -30,10 +30,11 @@ def test_parse_package_imports():
 
 
 def test_minimum_dependency_set():
-    main_path = "/Users/rami/code/proton/hideonfly"
-    core_path = "/Users/rami/code/proton/utilities/utils"
+    main_path = str(Path(os.getcwd()) / "tests/main_project")
+    core_path = str(Path(os.getcwd()) / "tests/core_package")
     min_deps = minimum_dependency_set(
-        main_path, core_path, main_module_name="hideonfly", core_module_name="pautils"
+        main_path,
+        core_path,
     )
 
-    assert min_deps == ["thirdpartydep1", "thirdpartydep5", "thirdpartydep6"]
+    assert min_deps == set(["thirdpartydep1", "thirdpartydep5", "thirdpartydep6"])
