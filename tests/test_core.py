@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from pack.core import (
+from packr.core import (
     minimum_dependency_set,
     parse_file_imports,
     parse_package_imports,
@@ -10,15 +10,12 @@ from pack.core import (
 
 
 def test_parse_file_imports():
-    fpath = Path(os.getcwd()) / "tests/core_package/core_package.py"
+    fpath = Path(os.getcwd()) / "tests/core_package/main.py"
     fpath = str(fpath)
     code = read_code(fpath)
     imports = parse_file_imports(fpath, code)
 
-    assert len(imports) == 1
-    assert imports[0].file == fpath
-    assert imports[0].name == "thirdpartydep1"
-    assert imports[0].lineno == 1
+    assert len(imports) == 3
 
 
 def test_parse_package_imports():

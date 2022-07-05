@@ -1,4 +1,4 @@
-# Pack: Python Packages Packer
+# Packr: Python Packages Packer
 
 Internal core packages quickly grow out of hand with multiple teams contributing to them and sharing them across services, infrastructure, and scripts.
 

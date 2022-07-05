@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pack"
+name = "packr"
 version = "0.1.0"
 description = "Dependency packer. Prunes dependencies from a core package if they are not required by a specific project."
 authors = ["Rami Awar <rami.awar.ra@gmail.com>"]

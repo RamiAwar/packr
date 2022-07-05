@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Set
 
 import nbformat
 
-from pack.imports_parser import ImportsParser
+from packr.imports_parser import ImportsParser
 
 logger = getLogger("main")
 
