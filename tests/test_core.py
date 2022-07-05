@@ -37,4 +37,6 @@ def test_minimum_dependency_set():
         core_path,
     )
 
-    assert min_deps == set(["thirdpartydep1", "thirdpartydep5", "thirdpartydep6"])
+    assert min_deps == set(
+        ["thirdpartydep1", "thirdpartydep5", "thirdpartydep6", "thirdpartydep8"]
+    )
