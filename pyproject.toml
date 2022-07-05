@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "minify"
+version = "0.1.0"
+description = "Command line application for pruning unused dependencies from a selected package based on which parts of the package are used."
+authors = ["Rami Awar <rami.awar.ra@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+nbformat = "^5.4.0"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^4.0.1"
+pytest = "^7.1.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[flake8]
+max-line-length = 120
