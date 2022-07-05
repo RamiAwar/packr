@@ -7,12 +7,14 @@ from typing import Any, Dict, List, Set
 
 import nbformat
 
-from minify.imports_parser import ImportsParser
+from pack.imports_parser import ImportsParser
 
 logger = getLogger("main")
 
 
 class udeque(collections.deque):
+    """Unique deque that only appends elements if they don't already exist in the deque"""
+
     def append(self, x: Any):
         if x in self:
             return
@@ -152,6 +154,7 @@ def minimum_dependency_set(
     # Create maps of file -> set of deps
     main_modules: Dict[str, Set[str]] = collections.defaultdict(set)
     for module in main_imported_modules:
+        # If module is a high level package, try to add alias to find more specific module
         if any(
             str(Path(*module.name.split("."), module.alias)) in m
             for m in main_user_modules
@@ -162,16 +165,14 @@ def minimum_dependency_set(
 
     core_modules: Dict[str, Set[str]] = collections.defaultdict(set)
     for module in core_imported_modules:
+        # If module is a high level package, try to add alias to find more specific module
         if any(
             str(Path(*module.name.split("."), module.alias)) in m
             for m in core_user_modules
         ):
             core_modules[module.file].add(module.name + "." + module.alias)
         else:
-            core_modules[module.file].add(
-                # ".".join(import_extractor(module.file[:-3], core_module_name))
-                module.name
-            )
+            core_modules[module.file].add(module.name)
 
     # Import path -> path map for core package
     core_import_to_path_map = {
@@ -188,22 +189,14 @@ def minimum_dependency_set(
     necessary_files = udeque()
     for file, modules in main_modules.items():
         for module in modules:
-            # If relative import, add main project module name
-            # if module.startswith("."):
-            #     module = main_module_name + module
-
             # Check if module is part of core module first
             if module in core_import_to_path_map:
                 necessary_files.append(core_import_to_path_map[module])
 
-            # elif module in main_import_to_path_map:
-            #     necessary_files.append(main_import_to_path_map[module])
-            # else:
-            #     necessary_files.append(module)
-
     # Find necessary imports
     necessary_imports = set()
     visited_files = set()
+
     while necessary_files:
         f = necessary_files.popleft()
         visited_files.add(f)
@@ -222,6 +215,7 @@ def minimum_dependency_set(
                 file = core_import_to_path_map[module]
                 if file not in visited_files:
                     necessary_files.append(file)
+
             elif module.startswith(core_module_name):
                 # This is probably a package import (not specific file)
                 # Need to import all subfiles/packages in this case
@@ -230,9 +224,6 @@ def minimum_dependency_set(
                         modules.append(m)
             else:
                 # If third party module, specify main package name only
-                # if core_module_name not in module and "." in module:
-                #     necessary_imports.add(module.split(".")[0])
-                # else:
                 necessary_imports.add(module)
 
     return necessary_imports

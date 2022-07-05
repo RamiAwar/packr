@@ -17,6 +17,8 @@ class ImportsParser:
         self.visit(parsed)
 
     def _add_module(self, name, try_, lineno, alias):
+        # Return alias as well since we sometimes have from imports (don't want to include top level package only)
+        # Knowing alias allows us to only read dependencies of exactly what was used
         self._modules.append(
             Module(name=name, try_=try_, file=self._fpath, lineno=lineno, alias=alias)
         )

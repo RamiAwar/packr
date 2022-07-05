@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from minify.core import (
+from pack.core import (
     minimum_dependency_set,
     parse_file_imports,
     parse_package_imports,

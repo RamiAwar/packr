@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "minify"
+name = "pack"
 version = "0.1.0"
-description = "Command line application for pruning unused dependencies from a selected package based on which parts of the package are used."
+description = "Dependency packer. Prunes dependencies from a core package if they are not required by a specific project."
 authors = ["Rami Awar <rami.awar.ra@gmail.com>"]
 license = "MIT"
 
