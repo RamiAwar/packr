@@ -25,6 +25,7 @@ In the very first trial of v0.0 of this, build times were reduced from 4 minutes
 
 ### Some terminology
 `Core package`: the package that is to be pruned of unnecessary dependencies
+
 `Main project`: the project that depends on the core package.
 
 ### How it works
