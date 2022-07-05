@@ -39,6 +39,7 @@ In the very first trial of v0.0 of this, build times were reduced from 4 minutes
 [X] Create a function to calculate the minimum dependencies required by a core package to work within a project based on what parts are used
 [ ] Create a command line interface to this function and more
 [ ] Create a function that updates a pyproject.toml file as specified above
+[ ] Look into pip requirements.txt support
 [ ] Possibly calculate example dev impact, environmental impact of time saved in builds, as well as example storage space saved
 
 
