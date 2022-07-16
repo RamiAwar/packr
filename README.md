@@ -1,4 +1,4 @@
-# Packr: Python Packages Packer
+# Packr: Python Package Tree Shaker
 
 Internal core packages quickly grow out of hand with multiple teams contributing to them and sharing them across services, infrastructure, and scripts.
 
@@ -16,7 +16,7 @@ Optimally, the solution would be to split the package into smaller packages. Rea
 
 ### A solution?
 
-If we knew what parts of a package are needed in a project, then we could technically analyze the dependency graph and prune everything that isn’t needed before installing! Poetry allows 'extras' specification, which we can leverage here.
+If we knew what parts of a package are needed in a project, then we could technically analyze the dependency graph and prune everything that isn’t needed before installing!
 
 Smaller environments means less installation time, faster CI/CD pipelines, happier developers, and less storage space needed for installed packages.
 
@@ -24,29 +24,23 @@ In the very first trial of v0.0 of this, build times were reduced from 4 minutes
 
 
 ### Some terminology
-`Core package`: the package that is to be pruned of unnecessary dependencies
+`Target package`: the package that is to be pruned of unnecessary dependencies
 
-`Main project`: the project that depends on the core package.
+`Project package`: the project that uses the target package.
 
 ### How it works
-- Scan all the files in the main project and list modules needed from core package
-- Find the dependencies needed by those important modules
-- Handle nested dependencies in core package
-- Return a list of the minimum required dependencies to make the core package work in this project
-- Update the core package's pyproject.toml file with all-optional packages, and an extra section for this project specifying the minimum required deps.
-
+- Scan all the files in the project package and list modules needed from target package
+- Find in turn the dependencies needed by those modules (recursively)
+- Return a list of the minimum required dependencies to make the target package work in this project (no import errors)
+- Output a new temporary `requirements.txt` or `pyproject.toml` for installing the target package as part of a deploy
 
 ### TODO:
 
 - [x] Create a function to calculate the minimum dependencies required by a core package to work within a project based on what parts are used
 
-- [ ] Create a command line interface to this function and more
+- [x] Create a command line interface to this function and more
 
-- [ ] Create a function that updates a pyproject.toml file as specified above
-
-- [ ] Look into pip requirements.txt support
-
-- [ ] Possibly calculate example dev impact, environmental impact of time saved in builds, as well as example storage space saved
+- [ ] Create a function that outputs a requirements.txt with those min dependencies
 
 
 ### Tests
